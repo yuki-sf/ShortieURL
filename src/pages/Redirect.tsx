@@ -48,11 +48,11 @@ export default function Redirect() {
       // If no password required, show preview then redirect
       if (!urlData.password || urlData.password.trim() === '') {
         setLoading(false);
-        // Auto redirect after 3 seconds to show title/description
+        // Auto redirect after 5 seconds to show preview
         setTimeout(async () => {
           await recordClick(urlData);
           window.location.href = urlData.original_url;
-        }, 3000);
+        }, 5000);
         return;
       }
 
@@ -65,19 +65,34 @@ export default function Redirect() {
 
   const recordClick = async (urlData: any) => {
     try {
-      // Record the click
-      await supabase.from('clicks').insert({
+      // Record the click first
+      const { error: clickError } = await supabase.from('clicks').insert({
         url_id: urlData.id,
         ip_address: '', // We can't get real IP in frontend
         user_agent: navigator.userAgent,
         referer: document.referrer,
       });
 
-      // Update click count
-      await supabase
-        .from('urls')
-        .update({ clicks: (urlData.clicks || 0) + 1 })
-        .eq('id', urlData.id);
+      if (clickError) {
+        console.error('Error recording click:', clickError);
+      }
+
+      // Use the increment function to update click count
+      const { error: incrementError } = await supabase.rpc('increment_url_clicks', { 
+        url_id: urlData.id 
+      });
+
+      if (incrementError) {
+        console.error('Error incrementing click count:', incrementError);
+        // Fallback to direct update if RPC fails
+        await supabase
+          .from('urls')
+          .update({ 
+            clicks: (urlData.clicks || 0) + 1,
+            updated_at: new Date().toISOString()
+          })
+          .eq('id', urlData.id);
+      }
     } catch (err) {
       console.error('Error recording click:', err);
     }
@@ -89,6 +104,7 @@ export default function Redirect() {
 
     if (password !== url.password) {
       setError('Incorrect password. Please try again.');
+      setPassword(''); // Clear password field on error
       return;
     }
 
@@ -157,7 +173,7 @@ export default function Redirect() {
             
             <div className="space-y-4">
               <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-primary mx-auto"></div>
-              <p className="text-sm text-muted-foreground">Redirecting in 3 seconds...</p>
+              <p className="text-sm text-muted-foreground">Redirecting in 5 seconds...</p>
               
               <Button 
                 onClick={async () => {
@@ -214,7 +230,10 @@ export default function Redirect() {
               </div>
               
               {error && (
-                <p className="text-destructive text-sm">{error}</p>
+                <div className="space-y-2">
+                  <p className="text-destructive text-sm">{error}</p>
+                  <p className="text-muted-foreground text-xs">Please enter the correct password to access this link.</p>
+                </div>
               )}
               
               <Button 
