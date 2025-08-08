@@ -45,6 +45,42 @@ export function UserLinks() {
   useEffect(() => {
     if (user) {
       fetchUserUrls();
+      
+      // Set up real-time subscription for URL updates
+      const channel = supabase
+        .channel('url-updates')
+        .on(
+          'postgres_changes',
+          {
+            event: 'UPDATE',
+            schema: 'public',
+            table: 'urls',
+            filter: `user_id=eq.${user.id}`
+          },
+          () => {
+            console.log('URL updated via real-time');
+            // Refresh data when URLs are updated
+            fetchUserUrls();
+          }
+        )
+        .subscribe();
+
+      // Also set up interval for additional refreshing
+      const interval = setInterval(() => {
+        fetchUserUrls();
+      }, 10000); // More frequent updates
+      
+      // Add focus event listener to refresh when user returns to tab
+      const handleFocus = () => {
+        fetchUserUrls();
+      };
+      window.addEventListener('focus', handleFocus);
+      
+      return () => {
+        supabase.removeChannel(channel);
+        clearInterval(interval);
+        window.removeEventListener('focus', handleFocus);
+      };
     }
   }, [user]);
 
