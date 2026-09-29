@@ -1,9 +1,17 @@
-import { Link, useNavigate } from 'react-router-dom';
+import { useNavigate } from 'react-router-dom';
 import { Button } from '@/components/ui/button';
 import { UrlShortener } from '@/components/UrlShortener';
 import { UserLinks } from '@/components/UserLinks';
 import { useAuth } from '@/hooks/useAuth';
-import { Link as LinkIcon, User, LogOut, Sparkles, Zap, Shield, Clock } from 'lucide-react';
+import {
+  Link as LinkIcon,
+  User,
+  LogOut,
+  ArrowUpRight,
+  Zap,
+  Shield,
+  BarChart3,
+} from 'lucide-react';
 
 const Index = () => {
   const { user, signOut, loading } = useAuth();
@@ -15,144 +23,276 @@ const Index = () => {
 
   if (loading) {
     return (
-      <div className="min-h-screen flex items-center justify-center bg-gradient-subtle">
-        <div className="text-center">
-          <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-primary mx-auto mb-4"></div>
-          <p className="text-muted-foreground">Loading ShortieURL...</p>
+      <div className="min-h-screen bg-[#f7f7f5] flex items-center justify-center">
+        <div className="flex items-center gap-3 text-sm text-neutral-500">
+          <div className="h-4 w-4 border-2 border-neutral-300 border-t-neutral-900 rounded-full animate-spin" />
+          Loading...
         </div>
       </div>
     );
   }
 
   return (
-    <div className="min-h-screen bg-gradient-subtle">
+    <div className="min-h-screen bg-[#f7f7f5] text-[#171717]">
       {/* Header */}
-      <header className="border-b border-border/50 bg-card/80 backdrop-blur-sm sticky top-0 z-50">
-        <div className="container mx-auto px-4 py-4 flex items-center justify-between">
-          <div className="flex items-center gap-2">
-            <LinkIcon className="h-8 w-8 text-primary animate-pulse" />
-            <h1 className="text-2xl font-bold bg-gradient-primary bg-clip-text text-transparent">
-              ShortieURL
-            </h1>
-            <Sparkles className="h-6 w-6 text-accent animate-bounce" />
-          </div>
-          
-          <div className="flex items-center gap-2">
+      <header className="sticky top-0 z-50 border-b border-neutral-200 bg-[#f7f7f5]/90 backdrop-blur-md">
+        <div className="max-w-6xl mx-auto px-5 md:px-8 h-16 flex items-center justify-between">
+
+          {/* Logo */}
+          <button
+            onClick={() => navigate('/')}
+            className="flex items-center gap-2.5 group"
+          >
+            <div className="h-8 w-8 bg-[#171717] text-white flex items-center justify-center transition-transform group-hover:-rotate-6">
+              <LinkIcon className="h-4 w-4" />
+            </div>
+
+            <span className="font-semibold tracking-tight text-lg">
+              Shortie
+            </span>
+          </button>
+
+          {/* Navigation */}
+          <div className="flex items-center gap-3">
             {user ? (
               <>
-                <span className="text-sm text-muted-foreground">
-                  Welcome, {user.email?.split('@')[0]}! 👋
+                <span className="hidden sm:block text-sm text-neutral-500">
+                  {user.email?.split('@')[0]}
                 </span>
+
                 <Button
                   onClick={handleSignOut}
                   variant="ghost"
                   size="sm"
-                  className="hover:bg-accent/20"
+                  className="text-neutral-600 hover:text-neutral-900 hover:bg-neutral-200/70 rounded-none"
                 >
                   <LogOut className="h-4 w-4 mr-2" />
-                  Sign Out
+                  Sign out
                 </Button>
               </>
             ) : (
               <Button
                 onClick={() => navigate('/auth')}
-                className="bg-gradient-primary hover:opacity-90 transform hover:scale-105 transition-all duration-300"
+                variant="outline"
+                size="sm"
+                className="rounded-none border-neutral-300 bg-transparent hover:bg-neutral-900 hover:text-white transition-colors"
               >
                 <User className="h-4 w-4 mr-2" />
-                Sign In
+                Sign in
               </Button>
             )}
           </div>
         </div>
       </header>
 
-      {/* Hero Section */}
-      <section className="py-20 px-4">
-        <div className="container mx-auto text-center">
-          <div className="max-w-4xl mx-auto mb-12">
-            <h2 className="text-5xl md:text-7xl font-bold mb-6">
-              <span className="bg-gradient-primary bg-clip-text text-transparent">
-                Shorten
-              </span>{' '}
-              <span className="bg-gradient-accent bg-clip-text text-transparent">
-                URLs
+      {/* Hero */}
+      <main>
+        <section className="relative overflow-hidden border-b border-neutral-200">
+
+          {/* Decorative grid */}
+          <div
+            className="absolute inset-0 opacity-[0.035]"
+            style={{
+              backgroundImage:
+                'linear-gradient(#171717 1px, transparent 1px), linear-gradient(90deg, #171717 1px, transparent 1px)',
+              backgroundSize: '48px 48px',
+            }}
+          />
+
+          <div className="relative max-w-6xl mx-auto px-5 md:px-8 pt-20 md:pt-28 pb-24">
+
+            {/* Small label */}
+            <div className="flex items-center gap-3 mb-8">
+              <span className="h-px w-8 bg-[#171717]" />
+              <span className="text-xs uppercase tracking-[0.2em] font-medium text-neutral-500">
+                URL Shortener
               </span>
-              <br />
-              <span className="text-3xl md:text-5xl">Make them cute & memorable ✨</span>
-            </h2>
-            <p className="text-xl text-muted-foreground mb-8 max-w-2xl mx-auto">
-              Transform your long, boring URLs into short, beautiful links that are easy to share and remember. 
-              Track clicks, customize slugs, and make the web a prettier place! 🔗
-            </p>
-          </div>
-
-          {/* URL Shortener Component */}
-          <UrlShortener />
-
-          {/* User Links Section */}
-          {user && (
-            <div className="mt-16">
-              <UserLinks />
-            </div>
-          )}
-
-          {/* Features */}
-          <div className="grid md:grid-cols-3 gap-8 mt-16 max-w-4xl mx-auto">
-            <div className="text-center p-6">
-              <div className="w-16 h-16 bg-gradient-primary rounded-2xl flex items-center justify-center mx-auto mb-4 shadow-glow">
-                <Zap className="h-8 w-8 text-primary-foreground" />
-              </div>
-              <h3 className="text-xl font-semibold mb-2">Lightning Fast</h3>
-              <p className="text-muted-foreground">
-                Generate short URLs instantly with our optimized backend
-              </p>
             </div>
 
-            <div className="text-center p-6">
-              <div className="w-16 h-16 bg-gradient-accent rounded-2xl flex items-center justify-center mx-auto mb-4 shadow-glow">
-                <Shield className="h-8 w-8 text-accent-foreground" />
+            {/* Heading */}
+            <div className="max-w-4xl">
+              <h1 className="text-5xl sm:text-6xl md:text-8xl font-semibold tracking-[-0.055em] leading-[0.9]">
+                Short links.
+                <br />
+                <span className="text-neutral-400">
+                  Nothing else.
+                </span>
+              </h1>
+
+              <div className="mt-8 flex flex-col md:flex-row md:items-end justify-between gap-8">
+                <p className="max-w-xl text-base md:text-lg leading-relaxed text-neutral-500">
+                  Turn long URLs into clean, memorable links.
+                  Keep them simple, share them anywhere, and track
+                  what happens after the click.
+                </p>
+
+                <div className="hidden md:flex items-center gap-2 text-sm text-neutral-400">
+                  <span>Built for the web</span>
+                  <ArrowUpRight className="h-4 w-4" />
+                </div>
               </div>
-              <h3 className="text-xl font-semibold mb-2">Secure & Private</h3>
-              <p className="text-muted-foreground">
-                Optional password protection and privacy settings for your links
-              </p>
             </div>
 
-            <div className="text-center p-6">
-              <div className="w-16 h-16 bg-gradient-primary rounded-2xl flex items-center justify-center mx-auto mb-4 shadow-glow">
-                <Clock className="h-8 w-8 text-primary-foreground" />
+            {/* Shortener */}
+            <div className="mt-14 md:mt-16">
+              <div className="border border-neutral-300 bg-white p-1 shadow-[8px_8px_0_#171717]">
+                <UrlShortener />
               </div>
-              <h3 className="text-xl font-semibold mb-2">Smart Expiration</h3>
-              <p className="text-muted-foreground">
-                Set expiration dates for temporary links and campaigns
-              </p>
+            </div>
+
+            {/* Tiny supporting text */}
+            <div className="mt-5 flex flex-wrap items-center gap-x-6 gap-y-2 text-xs text-neutral-400 uppercase tracking-wider">
+              <span>Fast redirects</span>
+              <span>•</span>
+              <span>Custom slugs</span>
+              <span>•</span>
+              <span>Click analytics</span>
             </div>
           </div>
+        </section>
 
-          {/* Call to Action */}
-          {!user && (
-            <div className="mt-16 p-8 rounded-3xl bg-gradient-accent/10 border border-accent/20 max-w-2xl mx-auto">
-              <h3 className="text-2xl font-bold mb-4">Ready to get started? 🚀</h3>
-              <p className="text-muted-foreground mb-6">
-                Sign up for a free account to track your links, create custom slugs, and access advanced features!
-              </p>
-              <Button
-                onClick={() => navigate('/auth')}
-                size="lg"
-                className="bg-gradient-accent hover:opacity-90 transform hover:scale-105 transition-all duration-300"
-              >
-                Create Free Account ✨
-              </Button>
+        {/* Logged-in links */}
+        {user && (
+          <section className="max-w-6xl mx-auto px-5 md:px-8 py-16">
+            <div className="flex items-center justify-between mb-8">
+              <div>
+                <p className="text-xs uppercase tracking-[0.2em] text-neutral-400 mb-2">
+                  Dashboard
+                </p>
+                <h2 className="text-2xl font-semibold tracking-tight">
+                  Your links
+                </h2>
+              </div>
             </div>
-          )}
-        </div>
-      </section>
+
+            <UserLinks />
+          </section>
+        )}
+
+        {/* Features */}
+        <section className="border-t border-neutral-200">
+          <div className="max-w-6xl mx-auto px-5 md:px-8 py-20">
+
+            <div className="grid md:grid-cols-3 border-l border-t border-neutral-200">
+
+              {/* Feature 1 */}
+              <div className="border-r border-b border-neutral-200 p-7 md:p-8">
+                <div className="flex items-start justify-between mb-14">
+                  <span className="text-xs text-neutral-400 font-mono">
+                    01
+                  </span>
+
+                  <Zap className="h-5 w-5 text-neutral-400" />
+                </div>
+
+                <h3 className="text-lg font-semibold mb-3">
+                  Fast by default
+                </h3>
+
+                <p className="text-sm leading-relaxed text-neutral-500">
+                  Short URLs should stay out of your way.
+                  Create them quickly and get straight to sharing.
+                </p>
+              </div>
+
+              {/* Feature 2 */}
+              <div className="border-r border-b border-neutral-200 p-7 md:p-8">
+                <div className="flex items-start justify-between mb-14">
+                  <span className="text-xs text-neutral-400 font-mono">
+                    02
+                  </span>
+
+                  <BarChart3 className="h-5 w-5 text-neutral-400" />
+                </div>
+
+                <h3 className="text-lg font-semibold mb-3">
+                  Know your clicks
+                </h3>
+
+                <p className="text-sm leading-relaxed text-neutral-500">
+                  Keep an eye on how your links perform without
+                  turning a simple URL into a complicated dashboard.
+                </p>
+              </div>
+
+              {/* Feature 3 */}
+              <div className="border-r border-b border-neutral-200 p-7 md:p-8">
+                <div className="flex items-start justify-between mb-14">
+                  <span className="text-xs text-neutral-400 font-mono">
+                    03
+                  </span>
+
+                  <Shield className="h-5 w-5 text-neutral-400" />
+                </div>
+
+                <h3 className="text-lg font-semibold mb-3">
+                  Built with control
+                </h3>
+
+                <p className="text-sm leading-relaxed text-neutral-500">
+                  Custom slugs, privacy controls, and expiration
+                  options when you need more than a basic redirect.
+                </p>
+              </div>
+
+            </div>
+          </div>
+        </section>
+
+        {/* CTA */}
+        {!user && (
+          <section className="border-t border-neutral-200 bg-[#171717] text-white">
+            <div className="max-w-6xl mx-auto px-5 md:px-8 py-20 md:py-24">
+
+              <div className="max-w-3xl">
+                <p className="text-xs uppercase tracking-[0.2em] text-neutral-500 mb-6">
+                  Create an account
+                </p>
+
+                <h2 className="text-4xl md:text-6xl font-semibold tracking-[-0.04em] leading-tight">
+                  Your links,
+                  <br />
+                  all in one place.
+                </h2>
+
+                <div className="mt-8 flex flex-col sm:flex-row sm:items-center gap-5">
+                  <p className="text-neutral-400 max-w-md text-sm leading-relaxed">
+                    Save your shortened URLs, create custom slugs,
+                    and keep track of your links from one simple dashboard.
+                  </p>
+
+                  <Button
+                    onClick={() => navigate('/auth')}
+                    size="lg"
+                    className="rounded-none bg-white text-[#171717] hover:bg-neutral-200 shrink-0"
+                  >
+                    Create free account
+                    <ArrowUpRight className="h-4 w-4 ml-2" />
+                  </Button>
+                </div>
+              </div>
+
+            </div>
+          </section>
+        )}
+      </main>
 
       {/* Footer */}
-      <footer className="border-t border-border/50 py-8 mt-20">
-        <div className="container mx-auto px-4 text-center">
-          <p className="text-muted-foreground">
-            Made with ❤️ using ShortieURL • Transform the web, one link at a time 🔗
+      <footer className="border-t border-neutral-200">
+        <div className="max-w-6xl mx-auto px-5 md:px-8 py-8 flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4">
+
+          <div className="flex items-center gap-2">
+            <div className="h-6 w-6 bg-[#171717] text-white flex items-center justify-center">
+              <LinkIcon className="h-3 w-3" />
+            </div>
+
+            <span className="text-sm font-medium">
+              Shortie
+            </span>
+          </div>
+
+          <p className="text-xs text-neutral-400">
+            Simple links for the internet.
           </p>
         </div>
       </footer>
