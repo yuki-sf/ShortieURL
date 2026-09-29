@@ -238,11 +238,21 @@ export function UserLinks() {
     }
   };
 
+  const getShortUrlBase = () => {
+    const source = new URLSearchParams(window.location.search).get('source');
+  
+    if (source === 'yukisf') {
+      return 'https://www.yukisf.me/url-shortie';
+    }
+  
+    return window.location.origin;
+  };
+
   const copyToClipboard = (slug: string) => {
-    const shortUrl = `${window.location.origin}/${slug}`;
-
+    const shortUrl = `${getShortUrlBase()}/${slug}`;
+  
     navigator.clipboard.writeText(shortUrl);
-
+  
     toast({
       title: 'Copied',
       description: 'Short URL copied to clipboard',
