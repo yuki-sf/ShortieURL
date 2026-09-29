@@ -181,17 +181,18 @@ export function UrlShortener() {
         .single();
 
       if (error) throw error;
-
-      const source = new URLSearchParams(window.location.search).get("source");
       
-      const baseUrl =
-        source === "yukisf"
-          ? "https://www.yukisf.me/url-shortie"
-          : window.location.origin;
+      const getShortUrlBase = () => {
+        const source = new URLSearchParams(window.location.search).get("source");
       
-      const shortUrl = `${baseUrl}/${data.short_slug}`;
-
-      setShortenedUrl(shortUrl);
+        if (source === "yukisf") {
+          return "https://www.yukisf.me/url-shortie";
+        }
+      
+        return window.location.origin;
+      };
+      
+      const shortUrl = `${getShortUrlBase()}/${data.short_slug}`;
 
       toast({
         title: 'URL Shortened',
