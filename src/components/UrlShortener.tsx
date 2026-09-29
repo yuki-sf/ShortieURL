@@ -182,7 +182,14 @@ export function UrlShortener() {
 
       if (error) throw error;
 
-      const shortUrl = `${window.location.origin}/${data.short_slug}`;
+      const source = new URLSearchParams(window.location.search).get("source");
+      
+      const baseUrl =
+        source === "yukisf"
+          ? "https://www.yukisf.me/url-shortie"
+          : window.location.origin;
+      
+      const shortUrl = `${baseUrl}/${data.short_slug}`;
 
       setShortenedUrl(shortUrl);
 
